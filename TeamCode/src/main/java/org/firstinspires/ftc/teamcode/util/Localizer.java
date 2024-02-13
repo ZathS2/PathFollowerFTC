@@ -52,7 +52,4 @@ public class Localizer
 
         timeSinceLastFrame.reset();
     }
-
-
-
 }
