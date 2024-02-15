@@ -1,2 +1,3 @@
-package org.firstinspires.ftc.teamcode.opMode;public class StraightTest {
+package org.firstinspires.ftc.teamcode.opMode;
+public class StraightTest {
 }
