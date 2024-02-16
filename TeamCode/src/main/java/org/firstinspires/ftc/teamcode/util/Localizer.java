@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.util;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.util.geometry.Pose2d;
 
 public class Localizer
@@ -24,7 +23,7 @@ public class Localizer
 
     public void update(double[] wheelVelocities)
     {
-        double[] robotVelocity = MecannumWheelKinematics.ForwardKinematics(wheelVelocities, imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate);
+        double[] robotVelocity = MecannumWheelKinematics.ForwardKinematics(wheelVelocities, 0);///imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate);
 
         double robotDeltaX = robotVelocity[0] * timeSinceLastFrame.time();
         double robotDeltaY = robotVelocity[1] * timeSinceLastFrame.time();
@@ -52,4 +51,13 @@ public class Localizer
 
         timeSinceLastFrame.reset();
     }
+
+    public Pose2d getCurrentPos()
+    {
+        if (currentPos == null)
+            return new Pose2d();
+
+        return currentPos;
+    }
+
 }
