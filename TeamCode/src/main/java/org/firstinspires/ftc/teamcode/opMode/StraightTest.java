@@ -14,7 +14,7 @@ public class StraightTest extends LinearOpMode
     {
         waitForStart();
 
-        drive.startRunning();
+        drive.startRun();
 
         while (!isStopRequested())
         {

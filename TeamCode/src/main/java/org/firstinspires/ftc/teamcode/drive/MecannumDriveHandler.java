@@ -18,12 +18,14 @@ public class MecannumDriveHandler
     DcMotorEx rBD;
     DcMotorEx rFD;
 
+    DcMotorEx[] motors = new DcMotorEx[4];
+
     IMU imu;
     Localizer localizer;
 
-    boolean startRunning = false;
+    ElapsedTime runTimer = new ElapsedTime();
+    boolean isRunning = false;
 
-    ElapsedTime timer = new ElapsedTime();
 
     public MecannumDriveHandler(HardwareMap hardwareMap)
     {
@@ -45,10 +47,17 @@ public class MecannumDriveHandler
         rBD.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rFD.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+
         lBD.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lFD.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rBD.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rFD.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        motors[0] = lFD;
+        motors[1] = rFD;
+        motors[2] = rBD;
+        motors[3] = lBD;
+
 
         // IMU
         //imu.initialize(DriveConstants.imuParameters);
@@ -60,6 +69,13 @@ public class MecannumDriveHandler
 
     public void update()
     {
+        if (isRunning && runTimer.time() < 5)
+        {
+            setPower(0.5);
+        } else {
+            setPower(0.0);
+        }
+
         double[] wheelVelocities = new double[] {lBD.getVelocity(AngleUnit.RADIANS), lFD.getVelocity(AngleUnit.RADIANS),
                                     rBD.getVelocity(AngleUnit.RADIANS), rFD.getVelocity(AngleUnit.RADIANS)};
 
@@ -67,7 +83,7 @@ public class MecannumDriveHandler
 
         // DAQUI PRA BAIXO É SÓ PRA TESTE RETIRAR JUNTO DAS VARIAVEIS DE TIMER E START RUNNING
 
-        if (timer.time() < 5 && startRunning)
+        if (runTimer.time() < 5 && isRunning)
         {
             lBD.setPower(0.5);
             lFD.setPower(0.5);
@@ -80,11 +96,16 @@ public class MecannumDriveHandler
             rFD.setPower(0);
         }
     }
-
-    public void startRunning()
+    public void startRun()
     {
-        startRunning = true;
-        timer.reset();
+        isRunning = true;
+        runTimer.reset();
+    }
+
+    public void setPower(double power)
+    {
+        for (int i = 0; i < motors.length; i++)
+            motors[i].setPower(power);
     }
 
     public Pose2d getCurrentPos()
