@@ -35,12 +35,12 @@ public class MecannumDriveHandler
         rBD = hardwareMap.get(DcMotorEx.class, "right_back_drive");
         rFD = hardwareMap.get(DcMotorEx.class, "right_front_drive");
 
-        //imu = hardwareMap.get(IMU.class, "imu1");
+        imu = hardwareMap.get(IMU.class, "imu1");
 
-        lBD.setDirection(DcMotorSimple.Direction.REVERSE);
-        lFD.setDirection(DcMotorSimple.Direction.REVERSE);
-        rBD.setDirection(DcMotorSimple.Direction.FORWARD);
-        rFD.setDirection(DcMotorSimple.Direction.FORWARD);
+        lBD.setDirection(DcMotorSimple.Direction.FORWARD);
+        lFD.setDirection(DcMotorSimple.Direction.FORWARD);
+        rBD.setDirection(DcMotorSimple.Direction.REVERSE);
+        rFD.setDirection(DcMotorSimple.Direction.REVERSE);
 
         lBD.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         lFD.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -60,41 +60,26 @@ public class MecannumDriveHandler
 
 
         // IMU
-        //imu.initialize(DriveConstants.imuParameters);
+        imu.initialize(DriveConstants.imuParameters);
 
         // localizer
-        localizer = new Localizer(null);
+        localizer = new Localizer(imu);
 
     }
 
     public void update()
     {
-        if (isRunning && runTimer.time() < 5)
+        if (isRunning && runTimer.time() < 2)
         {
             setPower(0.5);
         } else {
             setPower(0.0);
         }
 
-        double[] wheelVelocities = new double[] {lBD.getVelocity(AngleUnit.RADIANS), lFD.getVelocity(AngleUnit.RADIANS),
-                                    rBD.getVelocity(AngleUnit.RADIANS), rFD.getVelocity(AngleUnit.RADIANS)};
+        double[] wheelVelocities = new double[] {lFD.getVelocity(AngleUnit.RADIANS), rFD.getVelocity(AngleUnit.RADIANS),
+                                    rBD.getVelocity(AngleUnit.RADIANS), lBD.getVelocity(AngleUnit.RADIANS)};
 
         localizer.update(wheelVelocities);
-
-        // DAQUI PRA BAIXO É SÓ PRA TESTE RETIRAR JUNTO DAS VARIAVEIS DE TIMER E START RUNNING
-
-        if (runTimer.time() < 5 && isRunning)
-        {
-            lBD.setPower(0.5);
-            lFD.setPower(0.5);
-            rBD.setPower(0.5);
-            rFD.setPower(0.5);
-        } else {
-            lBD.setPower(0);
-            lFD.setPower(0);
-            rBD.setPower(0);
-            rFD.setPower(0);
-        }
     }
     public void startRun()
     {

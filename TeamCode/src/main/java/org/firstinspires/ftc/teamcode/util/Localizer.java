@@ -9,7 +9,7 @@ public class Localizer
 {
     MecannumWheelKinematics mecannumWheelKinematics = new MecannumWheelKinematics();
 
-    Pose2d currentPos;
+    Pose2d currentPos = new Pose2d();
 
     ElapsedTime timeSinceLastFrame = new ElapsedTime();
 
@@ -45,8 +45,8 @@ public class Localizer
         double fieldDeltaX = unRotated_dX * Math.cos(currentPos.angle) - unRotated_dY * Math.sin(currentPos.angle);
         double fieldDeltaY = unRotated_dY * Math.cos(currentPos.angle) + unRotated_dX * Math.sin(currentPos.angle);
 
-        currentPos.x += fieldDeltaX;
-        currentPos.y += fieldDeltaY;
+        currentPos.x += fieldDeltaX / 2.148;
+        currentPos.y += fieldDeltaY / 2.148;
         currentPos.angle += robotDeltaTheta;
 
         timeSinceLastFrame.reset();
