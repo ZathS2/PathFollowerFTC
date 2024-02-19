@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.checkerframework.checker.units.qual.A;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.util.Localizer;
 import org.firstinspires.ftc.teamcode.util.geometry.Pose2d;
@@ -26,8 +25,9 @@ public class MecannumDriveHandler
 
     DcMotorEx[] motors = new DcMotorEx[4];
 
-    ArrayList<int[]> lastWheelPositions; // Ticks
-    ArrayList<double[]> lastWheelVels; // Ticks/s
+    public ArrayList<int[]> lastWheelPositions; // Ticks
+    public ArrayList<double[]> lastWheelVels; // Ticks/s
+    public ArrayList<Double> lastAngularPos;
 
     IMU imu;
     Localizer localizer;
@@ -51,11 +51,15 @@ public class MecannumDriveHandler
         rBD.setDirection(DcMotorSimple.Direction.REVERSE);
         rFD.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        lBD.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lFD.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rBD.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rFD.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
         lBD.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         lFD.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rBD.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rFD.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
 
         lBD.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lFD.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -70,12 +74,17 @@ public class MecannumDriveHandler
 
         // IMU
         imu.initialize(DriveConstants.imuParameters);
+        imu.resetYaw();
 
         // localizer
-        localizer = new Localizer(imu);
+        localizer = new Localizer(imu, this);
 
         lastWheelPositions = new ArrayList<>();
         lastWheelVels = new ArrayList<>();
+        lastAngularPos = new ArrayList<>();
+
+
+        lastAngularPos.add(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
 
         lastWheelPositions.add(new int[] {0,0,0,0});
 
@@ -85,24 +94,12 @@ public class MecannumDriveHandler
     {
         if (isRunning && runTimer.time() < 2)
         {
-            setPower(0.5);
+            setPower(new double[] {-0.2,0.2,0.2,-0.2});
         } else {
-            setPower(0.0);
+            setPower(new double[] {0.0,0.0,0.0,0.0});
         }
 
-        getWheelPositions();
-        getWheelVelocities();
-
-        double[] wheelDeltas = new double[] {0,0,0,0};
-
-        for (int i = 0 ; i < wheelDeltas.length; i++)
-        {
-            double deltaTick = lastWheelPositions.get(1)[i] - lastWheelPositions.get(0)[i];
-
-            wheelDeltas[i] = encoderTicksToRadians(deltaTick);
-        }
-
-        localizer.update(wheelDeltas);
+        localizer.update();
     }
     public void startRun()
     {
@@ -110,10 +107,11 @@ public class MecannumDriveHandler
         runTimer.reset();
     }
 
-    public void setPower(double power)
+    public void setPower(double[] power)
     {
-        for (DcMotorEx motor : motors)
-            motor.setPower(power);
+        for (int i = 0; i < 4; i++)
+            motors[i].setPower(power[i]);
+
     }
 
     public int[] getWheelPositions()
@@ -156,15 +154,36 @@ public class MecannumDriveHandler
         return wheelVelocities;
     }
 
+    public double getAngularPos()
+    {
+        // Manter máximo de 2 elementos
+        if (lastAngularPos.size() > 2)
+            lastAngularPos.remove(0);
+
+        double angularPos = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        lastAngularPos.add(normalizeAngle(angularPos));
+
+        return angularPos;
+    }
+
 
     public Pose2d getCurrentPos()
     {
         return localizer.getCurrentPos();
     }
 
-    double encoderTicksToRadians(double ticks)
+    public double encoderTicksToRadians(double ticks)
     {
         return (Math.PI * ticks) / (TICKS_PER_REV / GEAR_RATIO);
     }
+
+    double normalizeAngle(double angle)
+    {
+        double fMod = angle - ((int) Math.floor(angle / Math.PI)) * Math.PI;
+        if (angle < 0)
+            fMod += Math.PI;
+        return fMod;
+    }
+
 
 }

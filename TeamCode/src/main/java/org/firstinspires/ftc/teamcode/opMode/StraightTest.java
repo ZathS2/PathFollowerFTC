@@ -27,10 +27,10 @@ public class StraightTest extends LinearOpMode
         {
             drive.update();
 
-            dashTel.addLine("x: " + drive.getCurrentPos().x);
-            dashTel.addLine("y: " + drive.getCurrentPos().y);
-            dashTel.addLine("angle: " + drive.getCurrentPos().angle);
-            dashTel.update();
+            telemetry.addLine("x: " + drive.getCurrentPos().x);
+            telemetry.addLine("y: " + drive.getCurrentPos().y);
+            telemetry.addLine("angle: " + Math.toDegrees(drive.getCurrentPos().angle));
+            telemetry.update();
         }
     }
 }

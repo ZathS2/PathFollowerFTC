@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.util;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.drive.MecannumDriveHandler;
 import org.firstinspires.ftc.teamcode.util.geometry.Pose2d;
 
 public class Localizer
@@ -15,15 +16,33 @@ public class Localizer
 
     IMU imu;
 
-    public Localizer(IMU imu)
+    MecannumDriveHandler drive;
+
+    public Localizer(IMU imu, MecannumDriveHandler drive)
     {
         this.imu = imu;
+        this.drive = drive;
         timeSinceLastFrame.reset();
     }
 
-    public void update(double[] wheelVelocities)
+    public void update()
     {
-        double[] robotVelocity = MecannumWheelKinematics.ForwardKinematics(wheelVelocities, 0);///imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate);
+        drive.getWheelPositions();
+        drive.getWheelVelocities();
+        drive.getAngularPos();
+
+        double[] wheelDeltas = new double[] {0,0,0,0};
+
+        for (int i = 0 ; i < wheelDeltas.length; i++)
+        {
+            double deltaTick = drive.lastWheelPositions.get(1)[i] - drive.lastWheelPositions.get(0)[i];
+
+            wheelDeltas[i] = drive.encoderTicksToRadians(deltaTick);
+        }
+
+        double deltaAngle = drive.lastAngularPos.get(1) - drive.lastAngularPos.get(0);
+
+        double[] robotVelocity = MecannumWheelKinematics.ForwardKinematics(wheelDeltas, deltaAngle);
 
         double robotDeltaX = robotVelocity[0];
         double robotDeltaY = robotVelocity[1];
@@ -48,8 +67,6 @@ public class Localizer
         currentPos.x += fieldDeltaX;
         currentPos.y += fieldDeltaY;
         currentPos.angle += robotDeltaTheta;
-
-        timeSinceLastFrame.reset();
     }
 
     public Pose2d getCurrentPos()
