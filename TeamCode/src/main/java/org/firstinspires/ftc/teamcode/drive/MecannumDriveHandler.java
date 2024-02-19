@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.drive;
 
+import static org.firstinspires.ftc.teamcode.drive.DriveConstants.GEAR_RATIO;
+import static org.firstinspires.ftc.teamcode.drive.DriveConstants.TICKS_PER_REV;
+
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -7,9 +10,12 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.checkerframework.checker.units.qual.A;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.util.Localizer;
 import org.firstinspires.ftc.teamcode.util.geometry.Pose2d;
+
+import java.util.ArrayList;
 
 public class MecannumDriveHandler
 {
@@ -19,6 +25,9 @@ public class MecannumDriveHandler
     DcMotorEx rFD;
 
     DcMotorEx[] motors = new DcMotorEx[4];
+
+    ArrayList<int[]> lastWheelPositions; // Ticks
+    ArrayList<double[]> lastWheelVels; // Ticks/s
 
     IMU imu;
     Localizer localizer;
@@ -65,6 +74,11 @@ public class MecannumDriveHandler
         // localizer
         localizer = new Localizer(imu);
 
+        lastWheelPositions = new ArrayList<>();
+        lastWheelVels = new ArrayList<>();
+
+        lastWheelPositions.add(new int[] {0,0,0,0});
+
     }
 
     public void update()
@@ -76,10 +90,19 @@ public class MecannumDriveHandler
             setPower(0.0);
         }
 
-        double[] wheelVelocities = new double[] {lFD.getVelocity(AngleUnit.RADIANS), rFD.getVelocity(AngleUnit.RADIANS),
-                                    rBD.getVelocity(AngleUnit.RADIANS), lBD.getVelocity(AngleUnit.RADIANS)};
+        getWheelPositions();
+        getWheelVelocities();
 
-        localizer.update(wheelVelocities);
+        double[] wheelDeltas = new double[] {0,0,0,0};
+
+        for (int i = 0 ; i < wheelDeltas.length; i++)
+        {
+            double deltaTick = lastWheelPositions.get(1)[i] - lastWheelPositions.get(0)[i];
+
+            wheelDeltas[i] = encoderTicksToRadians(deltaTick);
+        }
+
+        localizer.update(wheelDeltas);
     }
     public void startRun()
     {
@@ -89,13 +112,59 @@ public class MecannumDriveHandler
 
     public void setPower(double power)
     {
-        for (int i = 0; i < motors.length; i++)
-            motors[i].setPower(power);
+        for (DcMotorEx motor : motors)
+            motor.setPower(power);
     }
+
+    public int[] getWheelPositions()
+    {
+        // manter um máximo de 2 elementos
+        if (lastWheelPositions.size() > 2)
+        {
+            lastWheelPositions.remove(0);
+        }
+
+        int[] wheelPositions = new int[4];
+        for (int i = 0; i < wheelPositions.length; i++)
+        {
+            int position = motors[i].getCurrentPosition();
+            wheelPositions[i] = position;
+        }
+
+        lastWheelPositions.add(wheelPositions);
+        return wheelPositions;
+    }
+
+    public double[] getWheelVelocities()
+    {
+        // manter um máximo de 2 elementos
+        if (lastWheelVels.size() > 2)
+        {
+            lastWheelVels.remove(0);
+        }
+
+        double[] wheelVelocities = new double[4];
+
+        for (int i = 0; i < wheelVelocities.length; i++)
+        {
+            double velocity = motors[i].getVelocity();
+            wheelVelocities[i] = velocity;
+        }
+
+        lastWheelVels.add(wheelVelocities);
+
+        return wheelVelocities;
+    }
+
 
     public Pose2d getCurrentPos()
     {
         return localizer.getCurrentPos();
+    }
+
+    double encoderTicksToRadians(double ticks)
+    {
+        return (Math.PI * ticks) / (TICKS_PER_REV / GEAR_RATIO);
     }
 
 }

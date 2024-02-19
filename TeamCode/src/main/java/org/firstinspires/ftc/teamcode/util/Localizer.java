@@ -25,9 +25,9 @@ public class Localizer
     {
         double[] robotVelocity = MecannumWheelKinematics.ForwardKinematics(wheelVelocities, 0);///imu.getRobotAngularVelocity(AngleUnit.RADIANS).zRotationRate);
 
-        double robotDeltaX = robotVelocity[0] * timeSinceLastFrame.time();
-        double robotDeltaY = robotVelocity[1] * timeSinceLastFrame.time();
-        double robotDeltaTheta = robotVelocity[2] * timeSinceLastFrame.time();
+        double robotDeltaX = robotVelocity[0];
+        double robotDeltaY = robotVelocity[1];
+        double robotDeltaTheta = robotVelocity[2];
 
         double unRotated_dX;
         double unRotated_dY;
@@ -45,8 +45,8 @@ public class Localizer
         double fieldDeltaX = unRotated_dX * Math.cos(currentPos.angle) - unRotated_dY * Math.sin(currentPos.angle);
         double fieldDeltaY = unRotated_dY * Math.cos(currentPos.angle) + unRotated_dX * Math.sin(currentPos.angle);
 
-        currentPos.x += fieldDeltaX / 2.148;
-        currentPos.y += fieldDeltaY / 2.148;
+        currentPos.x += fieldDeltaX;
+        currentPos.y += fieldDeltaY;
         currentPos.angle += robotDeltaTheta;
 
         timeSinceLastFrame.reset();
