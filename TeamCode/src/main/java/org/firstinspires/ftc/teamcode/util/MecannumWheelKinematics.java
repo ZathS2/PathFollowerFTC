@@ -38,7 +38,7 @@ public class MecannumWheelKinematics
         return robotVelocity;
     }
 
-    public double[] InverseKinematics(double[] robotVelocity)
+    public static double[] InverseKinematics(double[] robotVelocity)
     {
         double[] wheelVelocities = new double[4];
 
@@ -61,7 +61,7 @@ public class MecannumWheelKinematics
         return angularVelocity * DriveConstants.WHEEL_RADIUS;
     }
 
-    double getAngularVelocity(double linearVelocity)
+    static double getAngularVelocity(double linearVelocity)
     {
         return linearVelocity / DriveConstants.WHEEL_RADIUS;
     }

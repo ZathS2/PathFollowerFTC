@@ -11,8 +11,9 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.teamcode.util.Localizer;
+import org.firstinspires.ftc.teamcode.util.MecannumWheelLocalizer;
 import org.firstinspires.ftc.teamcode.util.geometry.Pose2d;
+import org.firstinspires.ftc.teamcode.util.interfaces.Localizer;
 
 import java.util.ArrayList;
 
@@ -77,7 +78,7 @@ public class MecannumDriveHandler
         imu.resetYaw();
 
         // localizer
-        localizer = new Localizer(imu, this);
+        localizer = new MecannumWheelLocalizer(imu, this);
 
         lastWheelPositions = new ArrayList<>();
         lastWheelVels = new ArrayList<>();
@@ -85,6 +86,7 @@ public class MecannumDriveHandler
 
 
         lastAngularPos.add(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
+        lastWheelVels.add(new double[] {0.0,0.0,0.0,0.0});
 
         lastWheelPositions.add(new int[] {0,0,0,0});
 
@@ -92,13 +94,6 @@ public class MecannumDriveHandler
 
     public void update()
     {
-        if (isRunning && runTimer.time() < 2)
-        {
-            setPower(new double[] {-0.2,0.2,0.2,-0.2});
-        } else {
-            setPower(new double[] {0.0,0.0,0.0,0.0});
-        }
-
         localizer.update();
     }
     public void startRun()

@@ -20,4 +20,10 @@ public class Pose2d
         this.angle = angle;
     }
 
+    public void rotate(double angle)
+    {
+        x = x * Math.cos(angle) - y * Math.sin(angle);
+        y = y * Math.cos(angle) + x * Math.sin(angle);
+    }
+
 }

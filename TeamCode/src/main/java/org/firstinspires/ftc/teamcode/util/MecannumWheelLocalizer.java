@@ -5,8 +5,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.drive.MecannumDriveHandler;
 import org.firstinspires.ftc.teamcode.util.geometry.Pose2d;
+import org.firstinspires.ftc.teamcode.util.interfaces.Localizer;
 
-public class Localizer
+public class MecannumWheelLocalizer implements Localizer
 {
     MecannumWheelKinematics mecannumWheelKinematics = new MecannumWheelKinematics();
 
@@ -18,7 +19,7 @@ public class Localizer
 
     MecannumDriveHandler drive;
 
-    public Localizer(IMU imu, MecannumDriveHandler drive)
+    public MecannumWheelLocalizer(IMU imu, MecannumDriveHandler drive)
     {
         this.imu = imu;
         this.drive = drive;
@@ -44,8 +45,14 @@ public class Localizer
 
         double[] robotVelocity = MecannumWheelKinematics.ForwardKinematics(wheelDeltas, deltaAngle);
 
-        double robotDeltaX = robotVelocity[0];
-        double robotDeltaY = robotVelocity[1];
+        double movementAngle = Math.atan2(robotVelocity[1], robotVelocity[0]);
+        double distanceMagnitude = Math.hypot(robotVelocity[0], robotVelocity[1]);
+
+        // na regressão, x deve é o quanto estimou e y o quanto andou na verdade
+        double error = 0; // error = (distanceMagnitude * x) / y
+
+        double robotDeltaX = robotVelocity[0] - error * Math.cos(movementAngle);
+        double robotDeltaY = robotVelocity[1] - error * Math.sin(movementAngle);
         double robotDeltaTheta = robotVelocity[2];
 
         double unRotated_dX;
