@@ -19,6 +19,11 @@ public class MecannumWheelLocalizer implements Localizer
 
     MecannumDriveHandler drive;
 
+    double aRegressionValue = 0.0;
+    double bRegressionValue = 0.0;
+
+    LinearEquation linearEquation = new LinearEquation(aRegressionValue, bRegressionValue);
+
     public MecannumWheelLocalizer(IMU imu, MecannumDriveHandler drive)
     {
         this.imu = imu;
@@ -51,7 +56,7 @@ public class MecannumWheelLocalizer implements Localizer
         // na regressão, x deve é o quanto estimou e y o quanto andou na verdade
         double error = 0; // error = (distanceMagnitude * x) / y
 
-        double robotDeltaX = robotVelocity[0] - error * Math.cos(movementAngle);
+        double robotDeltaX = linearEquation.getY(distanceMagnitude) - error * Math.cos(movementAngle);
         double robotDeltaY = robotVelocity[1] - error * Math.sin(movementAngle);
         double robotDeltaTheta = robotVelocity[2];
 
