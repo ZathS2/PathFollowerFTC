@@ -2,6 +2,7 @@ package com.example.linearregressionpos;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -15,7 +16,8 @@ public class LinearRegressionPosition
 
         try
         {
-            File txtFile = new File("C:\\Users\\Usuario\\Documents\\GitHub\\PathFollowerFTC\\LinearRegressionPos\\src\\main\\java\\com\\example\\linearregressionpos\\res\\xSamples.txt");
+            URL path = LinearRegressionPosition.class.getResource("xSamples.txt");
+            File txtFile = new File(path.getFile());
             Scanner reader = new Scanner(txtFile);
             while (reader.hasNext())
                 xValues.add(Double.parseDouble(reader.nextLine()));
@@ -26,7 +28,8 @@ public class LinearRegressionPosition
 
         try
         {
-            File txtFile = new File("C:\\Users\\Usuario\\Documents\\GitHub\\PathFollowerFTC\\LinearRegressionPos\\src\\main\\java\\com\\example\\linearregressionpos\\res\\ySamples.txt");
+            URL path = LinearRegressionPosition.class.getResource("ySamples.txt");
+            File txtFile = new File(path.getFile());
             Scanner reader = new Scanner(txtFile);
             while (reader.hasNext())
                 yValues.add(Double.parseDouble(reader.nextLine()));
