@@ -10,13 +10,10 @@ public class MecannumWheelPathFollower implements PathFollower
     FeedforwardController ffController = new FeedforwardController(ffCoefficients);
 
 
+
     public void update()
     {
 
     }
 
-    public double robotCharacterization(double velocity, double accel)
-    {
-        return ffController.calculate(velocity, accel);
-    }
 }

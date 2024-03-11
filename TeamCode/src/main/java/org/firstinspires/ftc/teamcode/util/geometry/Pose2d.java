@@ -20,6 +20,13 @@ public class Pose2d
         this.angle = angle;
     }
 
+    public Pose2d(Vector2d pos, double angle)
+    {
+        this.x = pos.x;
+        this.y = pos.y;
+        this.angle = angle;
+    }
+
     public void rotate(double angle)
     {
         x = x * Math.cos(angle) - y * Math.sin(angle);

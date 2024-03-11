@@ -10,6 +10,9 @@ public class DriveConstants
     public static double GEAR_RATIO = 1.0 / 20.0;
     public static double TICKS_PER_REV = 28.0;
 
+    public static double MAX_VEL = 40; // CM/S
+    public static double MAX_ACCEL = 40; // CM/S²
+
     public static IMU.Parameters imuParameters = new IMU.Parameters(
             new RevHubOrientationOnRobot(
                     RevHubOrientationOnRobot.LogoFacingDirection.LEFT,

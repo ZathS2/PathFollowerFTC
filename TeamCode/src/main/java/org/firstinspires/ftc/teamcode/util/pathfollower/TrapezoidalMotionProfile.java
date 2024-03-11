@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.util.pathfollower;
 
-public class TrapezoidalMotionProfile
+import org.firstinspires.ftc.teamcode.util.interfaces.MotionProfile;
+
+public class TrapezoidalMotionProfile implements MotionProfile
 {
     double MAX_ACCEL;
     double MAX_VEL;
@@ -68,5 +70,23 @@ public class TrapezoidalMotionProfile
             profileValues[2] = -MAX_ACCEL;
             return profileValues;
         }
+    }
+
+    public double getRuntime(double distance)
+    {
+        double acceldt = MAX_VEL / MAX_ACCEL;
+
+        double halfDistance = distance / 2;
+        double accelDistance = 0.5 * MAX_ACCEL * Math.pow(acceldt,2);
+
+        if (accelDistance < halfDistance)
+        {
+            acceldt = Math.sqrt(halfDistance / (0.5 * MAX_ACCEL));
+        }
+
+        double cruiseDistance = distance - 2 * accelDistance;
+        double cruisedt = cruiseDistance / MAX_VEL;
+
+        return 2 * acceldt + cruisedt;
     }
 }

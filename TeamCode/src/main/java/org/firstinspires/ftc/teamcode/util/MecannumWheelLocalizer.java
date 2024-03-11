@@ -9,11 +9,8 @@ import org.firstinspires.ftc.teamcode.util.interfaces.Localizer;
 
 public class MecannumWheelLocalizer implements Localizer
 {
-    MecannumWheelKinematics mecannumWheelKinematics = new MecannumWheelKinematics();
 
     Pose2d currentPos = new Pose2d();
-
-    ElapsedTime timeSinceLastFrame = new ElapsedTime();
 
     IMU imu;
 
@@ -28,7 +25,6 @@ public class MecannumWheelLocalizer implements Localizer
     {
         this.imu = imu;
         this.drive = drive;
-        timeSinceLastFrame.reset();
     }
 
     public void update()
@@ -56,8 +52,8 @@ public class MecannumWheelLocalizer implements Localizer
         // na regressão, x deve é o quanto estimou e y o quanto andou na verdade
         double error = 0; // error = (distanceMagnitude * x) / y
 
-        double robotDeltaX = linearEquation.getY(distanceMagnitude) - error * Math.cos(movementAngle);
-        double robotDeltaY = robotVelocity[1] - error * Math.sin(movementAngle);
+        double robotDeltaX = robotVelocity[0];//linearEquation.getY(distanceMagnitude) - error * Math.cos(movementAngle);
+        double robotDeltaY = robotVelocity[1];//robotVelocity[1] - error * Math.sin(movementAngle);
         double robotDeltaTheta = robotVelocity[2];
 
         double unRotated_dX;
