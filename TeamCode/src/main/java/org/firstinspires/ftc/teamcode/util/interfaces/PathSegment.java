@@ -13,4 +13,5 @@ public interface PathSegment
     double findTByDistance(double distance);
     Vector2d findPointOnPath(double t);
     double getLength();
+    Vector2d calculate1stDerivative(double t);
 }

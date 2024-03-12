@@ -17,6 +17,10 @@ public class Trajectory
 
     // salva o tempo final de cada segmento
     double[] trajectoryRuntime;
+
+    double[] motionProfileValues;
+
+    double directionAngle;
     public Trajectory(PathSegment[] pathSegments, Pose2d initialPose)
     {
         this.initialPose = initialPose;
@@ -53,14 +57,19 @@ public class Trajectory
 
         double pathInitialTime = pathIndex == 0 ? 0 : trajectoryRuntime[pathIndex - 1];
 
-        // Distancia do começo do path
-        double[] motionProfileValues = motionProfiles[pathIndex].calculate(pathSegments[pathIndex].getLength(), elapsedTime - pathInitialTime);
+        // Calcular valores do motionProfile
+        motionProfileValues = motionProfiles[pathIndex].calculate(pathSegments[pathIndex].getLength(), elapsedTime - pathInitialTime);
 
         // Distancia para tempo
         double t = pathSegments[pathIndex].findTByDistance(motionProfileValues[0]);
 
         // Posição no caminho
         Vector2d currentPosition = pathSegments[pathIndex].findPointOnPath(t);
+
+        // Direção do movimento
+
+        Vector2d directionVector = pathSegments[pathIndex].calculate1stDerivative(t);
+        directionAngle = Math.atan2(directionVector.y, directionVector.x);
 
         // Lidar com ângulo
         double angle = 0;
@@ -73,5 +82,6 @@ public class Trajectory
     {
         return trajectoryRuntime[trajectoryRuntime.length - 1];
     }
-
+    public double[] getCurrentMotionProfileValues() { return motionProfileValues; }
+    public double getDirectionAngle() {return  directionAngle; }
 }

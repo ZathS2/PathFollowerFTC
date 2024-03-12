@@ -80,4 +80,10 @@ public class Line implements PathSegment
     {
         return length;
     }
+
+    @Override
+    public Vector2d calculate1stDerivative(double t) {
+
+        return new Vector2d(endPoint.x - startPoint.x, endPoint.y - startPoint.y);
+    }
 }
