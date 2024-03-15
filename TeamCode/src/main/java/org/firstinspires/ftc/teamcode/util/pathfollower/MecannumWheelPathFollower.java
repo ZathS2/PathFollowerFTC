@@ -1,9 +1,8 @@
 package org.firstinspires.ftc.teamcode.util.pathfollower;
 
-import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspires.ftc.teamcode.drive.MecannumDriveHandler;
 import org.firstinspires.ftc.teamcode.util.MecannumWheelKinematics;
+import org.firstinspires.ftc.teamcode.util.NanoTimer;
 import org.firstinspires.ftc.teamcode.util.Trajectory;
 import org.firstinspires.ftc.teamcode.util.controllers.FeedforwardCoefficients;
 import org.firstinspires.ftc.teamcode.util.controllers.FeedforwardController;
@@ -14,18 +13,20 @@ import org.firstinspires.ftc.teamcode.util.interfaces.PathFollower;
 
 public class MecannumWheelPathFollower implements PathFollower
 {
-    FeedforwardCoefficients ffCoefficients = new FeedforwardCoefficients(0,0,0);
+    FeedforwardCoefficients ffCoefficients = new FeedforwardCoefficients(1,0,0);
     FeedforwardController ffController = new FeedforwardController(ffCoefficients);
 
     Localizer localizer;
 
     Trajectory currentTrajectory;
-    ElapsedTime elapsedTime = new ElapsedTime(ElapsedTime.Resolution.SECONDS);
+    NanoTimer clock = new NanoTimer();
 
     MecannumDriveHandler drive;
-    public MecannumWheelPathFollower(Localizer localizer, MecannumDriveHandler drive)
+
+
+    public MecannumWheelPathFollower(MecannumDriveHandler drive)
     {
-        this.localizer = localizer;
+        this.localizer = drive.getLocalizer();
         this.drive = drive;
     }
     public void update()
@@ -36,7 +37,7 @@ public class MecannumWheelPathFollower implements PathFollower
         Pose2d currentPose = localizer.getCurrentPos();
 
         // calcular ponto na trajetória
-        Pose2d targetPose = currentTrajectory.calculatePoseOnTrajectory(elapsedTime.time());
+        Pose2d targetPose = currentTrajectory.calculatePoseOnTrajectory(clock.getElapsedTimeSeconds());
 
         // pega valores de motionProfile
         double[] motionProfileValues = currentTrajectory.getCurrentMotionProfileValues();
@@ -75,7 +76,7 @@ public class MecannumWheelPathFollower implements PathFollower
     public void followTrajectory(Trajectory trajectory)
     {
         currentTrajectory = trajectory;
-        elapsedTime.reset();
+        clock.resetTimer();
     }
 
 }

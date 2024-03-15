@@ -19,15 +19,15 @@ public class FieldView
     }
 
 
-    public void drawOnField(Pose2d drawPose)
+    public void drawRobotOnField(Pose2d drawPose)
     {
 
         packet = new TelemetryPacket();
 
         Vector2d positionInches = new Vector2d(drawPose.x / 2.54, drawPose.y / 2.54);
-        double robotDimensionsInches = DriveConstants.ROBOT_WIDTH / 2.54;
+        double robotWidthInches = DriveConstants.ROBOT_WIDTH / 2.54;
         packet.fieldOverlay()
-                .strokeRect(positionInches.x, positionInches.y, robotDimensionsInches, robotDimensionsInches);
+                .strokeCircle(positionInches.x, positionInches.y, robotWidthInches / 2);
 
         dashboard.sendTelemetryPacket(packet);
 

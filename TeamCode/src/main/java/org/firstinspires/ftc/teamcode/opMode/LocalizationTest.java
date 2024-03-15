@@ -13,7 +13,7 @@ public class LocalizationTest extends LinearOpMode
     @Override
     public void runOpMode() throws InterruptedException
     {
-        drive = new MecannumDriveHandler(hardwareMap);
+        drive = new MecannumDriveHandler(hardwareMap, telemetry);
 
         waitForStart();
 

@@ -17,7 +17,7 @@ public class StraightTest extends LinearOpMode
     @Override
     public void runOpMode() throws InterruptedException
     {
-        MecannumDriveHandler drive = new MecannumDriveHandler(hardwareMap);
+        MecannumDriveHandler drive = new MecannumDriveHandler(hardwareMap, telemetry);
 
         waitForStart();
 

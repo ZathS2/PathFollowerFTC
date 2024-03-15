@@ -1,6 +1,10 @@
 package org.firstinspires.ftc.teamcode.util;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
+import org.firstinspires.ftc.teamcode.util.TelemetryUtil.FieldView;
 import org.firstinspires.ftc.teamcode.util.geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.util.geometry.Vector2d;
 import org.firstinspires.ftc.teamcode.util.interfaces.MotionProfile;
@@ -21,7 +25,11 @@ public class Trajectory
     double[] motionProfileValues;
 
     double directionAngle;
-    public Trajectory(PathSegment[] pathSegments, Pose2d initialPose)
+
+    FtcDashboard dashboard;
+
+    FieldView fieldView;
+    public Trajectory(PathSegment[] pathSegments, Pose2d initialPose, FtcDashboard dashboard)
     {
         this.initialPose = initialPose;
         this.pathSegments = pathSegments;
@@ -40,6 +48,9 @@ public class Trajectory
 
             trajectoryRuntime[i] = trajectoryRuntime[i - 1] + motionProfiles[i].getRuntime(pathSegments[i].getLength());
         }
+
+        this.dashboard = dashboard;
+        fieldView = new FieldView(new TelemetryPacket(), dashboard);
     }
 
     public Pose2d calculatePoseOnTrajectory(double elapsedTime)
@@ -74,8 +85,16 @@ public class Trajectory
         // Lidar com ângulo
         double angle = 0;
 
+        Pose2d currentPose = new Pose2d(currentPosition, angle);
 
-        return new Pose2d(currentPosition, angle);
+        drawTrajectory(currentPose);
+
+        return currentPose;
+    }
+
+    public void drawTrajectory(Pose2d pos)
+    {
+        fieldView.drawRobotOnField(pos);
     }
 
     public double getTrajectoryRuntime()

@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.util.MecannumWheelLocalizer;
 import org.firstinspires.ftc.teamcode.util.geometry.Pose2d;
@@ -36,9 +37,12 @@ public class MecannumDriveHandler
     ElapsedTime runTimer = new ElapsedTime();
     boolean isRunning = false;
 
+    Telemetry telemetry;
 
-    public MecannumDriveHandler(HardwareMap hardwareMap)
+
+    public MecannumDriveHandler(HardwareMap hardwareMap, Telemetry telemetry)
     {
+        this.telemetry = telemetry;
         // Inicializar motores
         lBD = hardwareMap.get(DcMotorEx.class, "left_back_drive");
         lFD = hardwareMap.get(DcMotorEx.class, "left_front_drive");
@@ -105,7 +109,10 @@ public class MecannumDriveHandler
     public void setPower(double[] power)
     {
         for (int i = 0; i < 4; i++)
-            motors[i].setPower(power[i]);
+        {
+            telemetry.addLine("a " + power[i]);
+
+        }
 
     }
 
@@ -161,6 +168,7 @@ public class MecannumDriveHandler
         return angularPos;
     }
 
+    public Localizer getLocalizer(){ return localizer; }
 
     public Pose2d getCurrentPos()
     {
