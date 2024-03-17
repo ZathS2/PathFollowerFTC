@@ -33,4 +33,9 @@ public class Pose2d
         y = y * Math.cos(angle) + x * Math.sin(angle);
     }
 
+    public static double angleDistance(Pose2d start, Pose2d end)
+    {
+        return end.angle - start.angle;
+    }
+
 }

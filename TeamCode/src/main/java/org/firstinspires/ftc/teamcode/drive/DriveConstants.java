@@ -12,6 +12,8 @@ public class DriveConstants
 
     public static double MAX_VEL = 40; // CM/S
     public static double MAX_ACCEL = 40; // CM/S²
+    public static double MAX_ANGULAR_VEL = Math.toRadians(180); // Deg/s
+    public static double MAX_ANGULAR_ACCEL = Math.toRadians(180); // Deg/s²
 
     public static IMU.Parameters imuParameters = new IMU.Parameters(
             new RevHubOrientationOnRobot(

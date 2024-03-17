@@ -52,7 +52,7 @@ public class Line implements PathSegment
 
     public double findTByDistance(double distance)
     {
-        if (distance >= 0 && distance <= length)
+        /*if (distance >= 0 && distance <= length)
         {
             for (int i = 0; i < lookupTable.length - 1; i++)
             {
@@ -71,9 +71,49 @@ public class Line implements PathSegment
                     return estimateT;
                 }
             }
+        }*/
+
+        if (distance <= 0)
+            return 0.0;
+
+
+        if (distance >= length)
+            return 1.0;
+
+        int left = 0;
+        int right = lookupTable.length - 1;
+
+        int lowerBoundIndex = -1;
+        int upperBoundIndex = -1;
+
+        while (left <= right)
+        {
+            int mid = left + (right - left) / 2;
+
+            if (lookupTable[mid].y == distance)
+            {
+                return lookupTable[mid].x;
+            }
+
+            if (lookupTable[mid].y > distance)
+            {
+                right = mid - 1;
+            } else {
+                left = mid + 1;
+            }
         }
 
-        return distance / length;
+        if (lowerBoundIndex == -1)
+        {
+            lowerBoundIndex = right;
+            upperBoundIndex = left;
+        }
+
+        double m = (lookupTable[upperBoundIndex].y - lookupTable[lowerBoundIndex].y) / (lookupTable[upperBoundIndex].x - lookupTable[lowerBoundIndex].x);
+        return ((distance - lookupTable[lowerBoundIndex].y) / m) + lookupTable[lowerBoundIndex].x;
+
+
+
     }
 
     public double getLength()

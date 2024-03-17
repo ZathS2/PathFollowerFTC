@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
+import org.firstinspires.ftc.teamcode.util.PathSegments.Line;
 import org.firstinspires.ftc.teamcode.util.TelemetryUtil.FieldView;
 import org.firstinspires.ftc.teamcode.util.geometry.Pose2d;
 import org.firstinspires.ftc.teamcode.util.geometry.Vector2d;
@@ -16,11 +17,13 @@ public class Trajectory
 {
     PathSegment[] pathSegments;
     MotionProfile[] motionProfiles;
+    MotionProfile[] angularMotionProfiles;
 
     Pose2d initialPose;
 
     // salva o tempo final de cada segmento
     double[] trajectoryRuntime;
+    double[] angularTrajectoryRuntime;
 
     double[] motionProfileValues;
 
@@ -30,6 +33,40 @@ public class Trajectory
 
     FieldView fieldView;
     public Trajectory(PathSegment[] pathSegments, Pose2d initialPose, FtcDashboard dashboard)
+    {
+        initTrajectory(pathSegments, initialPose, dashboard);
+    }
+
+    public Trajectory(PathSegment[] pathSegments, Pose2d initialPose, FtcDashboard dashboard, Pose2d[] poses)
+    {
+        initTrajectory(pathSegments, initialPose, dashboard);
+
+        angularMotionProfiles = new MotionProfile[poses.length];
+
+        angularTrajectoryRuntime = new double[poses.length];
+
+        if (poses.length == 0)
+            return;
+
+        for (int i = 0; i < poses.length; i++)
+        {
+            angularMotionProfiles[i] = new TrapezoidalMotionProfile(DriveConstants.MAX_ANGULAR_ACCEL, DriveConstants.MAX_ANGULAR_VEL);
+
+            if (i == 0)
+            {
+                angularTrajectoryRuntime[i] = angularMotionProfiles[i].getRuntime(Pose2d.angleDistance(poses[i], poses[i + 1]));
+                continue;
+            }
+
+            if (i + 1 >= poses.length)
+                break;
+
+            angularTrajectoryRuntime[i] = angularTrajectoryRuntime[i - 1] + angularMotionProfiles[i].getRuntime(Pose2d.angleDistance(poses[i],poses[i+1]));
+
+        }
+    }
+
+    void initTrajectory(PathSegment[] pathSegments, Pose2d initialPose, FtcDashboard dashboard)
     {
         this.initialPose = initialPose;
         this.pathSegments = pathSegments;
